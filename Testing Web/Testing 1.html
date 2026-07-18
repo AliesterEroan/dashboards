@@ -1,0 +1,400 @@
+<!-- AWP_In_Variable Name='"Web_CMD_StartMarche"' -->
+<!-- AWP_In_Variable Name='"Web_CMD_StopMarche"' -->
+
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Industrial Dashboard</title>
+    <style>
+        /* ================= THEME DEFINITIONS ================= */
+        :root {
+            --bg-color: #0b0f19;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #111827 0%, #070a13 100%);
+            --bg-grid: rgba(56, 189, 248, 0.03);
+            --panel-bg: rgba(15, 23, 42, 0.65);
+            --panel-border: rgba(56, 189, 248, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --input-bg: #020617;
+            --btn-menu-bg: rgba(30, 41, 59, 0.4);
+            --shadow-color: rgba(0, 0, 0, 0.6);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
+            --bg-grid: rgba(15, 23, 42, 0.03);
+            --panel-bg: rgba(255, 255, 255, 0.75);
+            --panel-border: rgba(15, 23, 42, 0.12);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.2);
+            --input-bg: #f8fafc;
+            --btn-menu-bg: rgba(241, 245, 249, 0.9);
+            --shadow-color: rgba(15, 23, 42, 0.08);
+        }
+
+        [data-theme="tunisia"] {
+            --bg-color: #120304;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #1c0507 0%, #090102 100%);
+            --bg-grid: rgba(231, 31, 40, 0.04);
+            --panel-bg: rgba(28, 5, 7, 0.7);
+            --panel-border: rgba(231, 31, 40, 0.3);
+            --text-main: #fff5f5;
+            --text-muted: #fda4af;
+            --accent: #e71f28;
+            --accent-glow: rgba(231, 31, 40, 0.5);
+            --input-bg: #0b0102;
+            --btn-menu-bg: rgba(231, 31, 40, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        [data-theme="lebanon"] {
+            --bg-color: #030f08;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #051e10 0%, #010704 100%);
+            --bg-grid: rgba(16, 185, 129, 0.04);
+            --panel-bg: rgba(5, 30, 16, 0.65);
+            --panel-border: rgba(16, 185, 129, 0.3);
+            --text-main: #f0fdf4;
+            --text-muted: #6ee7b7;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.5);
+            --input-bg: #010a04;
+            --btn-menu-bg: rgba(16, 185, 129, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* ================= GLOBAL DESIGN ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: all 0.3s ease; }
+        
+        body { 
+            background: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+            background-size: 35px 35px;
+        }
+
+        .top-nav {
+            width: 100%; max-width: 1000px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; background: var(--panel-bg); padding: 15px 25px;
+            border-radius: 20px; border: 1px solid var(--panel-border);
+            box-shadow: 0 10px 30px var(--shadow-color); backdrop-filter: blur(10px);
+        }
+        .title-wrapper { display: flex; align-items: center; gap: 12px; }
+        .sys-title { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+        .theme-flag { font-size: 24px; animation: flagPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        @keyframes flagPop {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .control-group { display: flex; gap: 15px; align-items: center; }
+        
+        select {
+            background: var(--input-bg); color: var(--text-main); border: 1px solid var(--panel-border);
+            padding: 8px 12px; border-radius: 10px; cursor: pointer; outline: none; font-size: 13px;
+        }
+
+        .panel { 
+            width: 100%; max-width: 1000px; 
+            background: var(--panel-bg); 
+            border: 1px solid var(--panel-border); 
+            border-radius: 28px; padding: 35px; 
+            box-shadow: 0 25px 55px var(--shadow-color); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: none; 
+        }
+        .panel.active { display: block; animation: activePanel 0.4s ease; }
+        @keyframes activePanel { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 22px; border-bottom: 2px solid var(--panel-border); padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+
+        .welcome-grid { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 500px; margin: 40px auto; align-items: center; }
+        
+        .btn { padding: 14px 28px; font-size: 14px; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 1px; text-transform: uppercase; width: 100%; }
+        .btn:active { transform: scale(0.96); }
+        
+        .btn-menu { background: var(--btn-menu-bg); border: 1px solid var(--panel-border); padding: 25px; font-size: 18px; color: var(--text-main); border-radius: 20px; box-shadow: 0 8px 20px var(--shadow-color); justify-content: center;}
+        .btn-menu:hover { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-3px); }
+        
+        .btn-on { background: linear-gradient(135deg, #059669 0%, #10b981 100%); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); color: white; }
+        .btn-off { background: linear-gradient(135deg, #be123c 0%, #f43f5e 100%); box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); color: white; }
+        .btn-back { background: transparent; border: 1px solid var(--panel-border); color: var(--text-main); padding: 8px 18px; border-radius: 10px; width: auto; }
+
+        .conveyor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .card-col { display: flex; flex-direction: column; gap: 20px; }
+        .card { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--panel-border); border-radius: 20px; padding: 22px; }
+        [data-theme="light"] .card { background: rgba(255,255,255,0.4); }
+        
+        .card-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; font-weight: 800; letter-spacing: 1.5px; border-inline-start: 3px solid var(--accent); padding-inline-start: 8px; }
+
+        .io-field { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .io-label { font-size: 14px; color: var(--text-main); }
+        
+        .motor-status { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #334155; }
+        
+        .status-dot.val-1 { 
+            background: #10b981; 
+            box-shadow: 0 0 15px #10b981, 0 0 25px #10b981; 
+        }
+
+        .conveyor-visual { height: 90px; background: var(--input-bg); border-radius: 18px; border: 1px solid var(--panel-border); position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; overflow: hidden; }
+        .conveyor-belt { position: absolute; left: 40px; right: 40px; height: 6px; background: var(--accent); box-shadow: 0 0 14px var(--accent-glow); opacity: 0.6; }
+        .conveyor-wheel { width: 28px; height: 28px; border-radius: 50%; background: transparent; border: 4px dashed var(--text-muted); animation: spin 2s linear infinite paused; }
+        
+        body[data-motor-run="true"] .conveyor-wheel { animation-play-state: running; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        html[dir="rtl"] .card-title { border-inline-start: none; border-inline-end: 3px solid var(--accent); padding-inline-start: 0; padding-inline-end: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Configuration Header Bar -->
+    <div class="top-nav">
+        <div class="title-wrapper">
+            <div class="sys-title" id="navTitle" data-i18n="nav_title">SYS-CONVEYOR V1.0</div>
+            <div class="theme-flag" id="activeFlag"></div>
+        </div>
+        <div class="control-group">
+            <select id="themeSelect" onchange="changeTheme(this.value)">
+                <option value="dark">🌌 Dark Mode</option>
+                <option value="light">☀️ Light Mode</option>
+                <option value="tunisia">🇹🇳 Theme Tunisie</option>
+                <option value="lebanon">🇱🇧 Theme Liban</option>
+            </select>
+            <select id="langSelect" onchange="changeLanguage(this.value)">
+                <option value="FR">Français</option>
+                <option value="EN">English</option>
+                <option value="AR">العربية</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ==================== SCREEN 1: HOME ACCUEIL ==================== -->
+    <div id="screen-welcome" class="panel active">
+        <h2 data-i18n="menu_title">Système de Navigation</h2>
+        <div class="welcome-grid">
+            <button class="btn btn-menu" onclick="switchScreen('screen-conveyor')">
+                <span style="color:var(--accent); margin-inline-end: 15px;">⬢</span> <span data-i18n="menu_enter">Entrer au Terminal de Contrôle</span>
+            </button>
+        </div>
+        <div style="margin-top:50px; font-size:11px; color:var(--text-muted); text-align: center; letter-spacing: 2px;" data-i18n="sys_active">
+            HMI SYSTEM ACTIVE // CYCLE READY
+        </div>
+    </div>
+
+    <!-- ==================== SCREEN 2: TERMINAL DE CONTROLE ==================== -->
+    <div id="screen-conveyor" class="panel">
+        <h2>
+            <span data-i18n="term_conv">Terminal de Contrôle Cycle</span>
+            <button class="btn btn-back" onclick="switchScreen('screen-welcome')" data-i18n="btn_back">Retour</button>
+        </h2>
+        
+        <div class="conveyor-grid">
+            <!-- Left Column: Diagnostics I/O -->
+            <div class="card-col">
+                <div class="card">
+                    <div class="card-title" data-i18n="title_diag">Statut Entrées / Sorties</div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-moteur-on"></div>
+                        <span class="io-label" data-i18n="lbl_marche">Système en Marche</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-km1"></div>
+                        <span class="io-label" data-i18n="lbl_km1">Moteur KM1 (Aller)</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-km2"></div>
+                        <span class="io-label" data-i18n="lbl_km2">Moteur KM2 (Retour)</span>
+                    </div>
+                    <div class="motor-status" style="margin-top: 20px; border-top: 1px solid var(--panel-border); padding-top: 15px;">
+                        <div class="status-dot" id="status-b1"></div>
+                        <span class="io-label" data-i18n="lbl_b1">Capteur B1 (Origine)</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-b2"></div>
+                        <span class="io-label" data-i18n="lbl_b2">Capteur B2 (Inversion)</span>
+                    </div>
+                </div>
+
+                <div class="conveyor-visual">
+                    <div class="conveyor-wheel"></div>
+                    <div class="conveyor-belt"></div>
+                    <div class="conveyor-wheel"></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Simple Action Forms -->
+            <div class="card-col" style="justify-content: center;">
+                <div class="card">
+                    <div class="card-title" data-i18n="title_actions">Commandes Manuelles</div>
+                    <form method="post" action="" style="margin-bottom: 20px;">
+                        <input type="hidden" name='"Web_CMD_StartMarche"' value="1">
+                        <button type="submit" class="btn btn-on" data-i18n="btn_on">Démarrer Cycle (On)</button>
+                    </form>
+                    <form method="post" action="">
+                        <input type="hidden" name='"Web_CMD_StopMarche"' value="1">
+                        <button type="submit" class="btn btn-off" data-i18n="btn_off">Arrêt Urgence (Off)</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CORE JAVASCRIPT ENGINE ==================== -->
+    <script>
+        const langDictionary = {
+            FR: {
+                nav_title: "SYS-CONVOYEUR V1.0",
+                menu_title: "Système de Navigation",
+                menu_enter: "Entrer au Terminal de Contrôle",
+                sys_active: "SYSTÈME HMI ACTIF // CYCLE PRÊT",
+                term_conv: "Terminal de Contrôle Cycle",
+                btn_back: "Retour",
+                btn_on: "Démarrer Cycle (On)",
+                btn_off: "Arrêt d'Urgence (Off)",
+                title_diag: "Statut Entrées / Sorties",
+                title_actions: "Commandes Manuelles",
+                lbl_marche: "Système en Marche",
+                lbl_km1: "Moteur KM1 (Aller)",
+                lbl_km2: "Moteur KM2 (Retour)",
+                lbl_b1: "Capteur B1 (Origine)",
+                lbl_b2: "Capteur B2 (Inversion)"
+            },
+            EN: {
+                nav_title: "SYS-CONVEYOR V1.0",
+                menu_title: "Navigation System",
+                menu_enter: "Enter Control Terminal",
+                sys_active: "HMI SYSTEM ACTIVE // CYCLE READY",
+                term_conv: "Cycle Control Terminal",
+                btn_back: "Back",
+                btn_on: "Start Cycle (On)",
+                btn_off: "Emergency Stop (Off)",
+                title_diag: "Input / Output Status",
+                title_actions: "Manual Commands",
+                lbl_marche: "System Running",
+                lbl_km1: "Motor KM1 (Forward)",
+                lbl_km2: "Motor KM2 (Backward)",
+                lbl_b1: "Sensor B1 (Home)",
+                lbl_b2: "Sensor B2 (Inversion)"
+            },
+            AR: {
+                nav_title: "نظام التحكم V1.0",
+                menu_title: "نظام التحكم والملاحة",
+                menu_enter: "الدخول إلى لوحة التحكم",
+                sys_active: "نظام HMI نشط // الدورة جاهزة للتشغيل",
+                term_conv: "لوحة التحكم في دورة الحزام",
+                btn_back: "رجوع",
+                btn_on: "إطلاق الدورة (On)",
+                btn_off: "إيقاف طوارئ (Off)",
+                title_diag: "حالة المداخل والمخارج الإشارتية",
+                title_actions: "أوامر التحكم اليدوي",
+                lbl_marche: "النظام في حالة تشغيل",
+                lbl_km1: "المحرك KM1 (ذهاب)",
+                lbl_km2: "المحرك KM2 (إياب)",
+                lbl_b1: "المستشعر B1 (البداية)",
+                lbl_b2: "المستشعر B2 (العكس)"
+            }
+        };
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            sessionStorage.setItem('activeScreen', screenId);
+        }
+
+        function updateRealTimeData() {
+            const cacheBuster = "?t=" + new Date().getTime();
+            fetch('data.html' + cacheBuster)
+                .then(response => {
+                    if (!response.ok) throw new Error("Offline");
+                    return response.text();
+                })
+                .then(text => {
+                    const data = JSON.parse(text);
+
+                    const isMoving = (data.km1 == "1" || data.km1 == "true" || data.km2 == "1" || data.km2 == "true");
+                    document.body.setAttribute('data-motor-run', isMoving ? "true" : "false");
+
+                    updateStatusDot('status-moteur-on', data.Marche == "1" || data.Marche == "true");
+                    updateStatusDot('status-km1', data.km1 == "1" || data.km1 == "true");
+                    updateStatusDot('status-km2', data.km2 == "1" || data.km2 == "true");
+                    updateStatusDot('status-b1', data.b1 == "1" || data.b1 == "true");
+                    updateStatusDot('status-b2', data.b2 == "1" || data.b2 == "true");
+                })
+                .catch(err => console.log("Sync lost..."));
+        }
+
+        function updateStatusDot(elementId, isActive) {
+            const el = document.getElementById(elementId);
+            if (el) isActive ? el.classList.add('val-1') : el.classList.remove('val-1');
+        }
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch(window.location.href, { method: 'POST', body: formData })
+                .then(() => setTimeout(updateRealTimeData, 100));
+            });
+        });
+
+        // Theme Switcher Engine with Flags implementation
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('selectedTheme', themeName);
+
+            const flagContainer = document.getElementById('activeFlag');
+            if (themeName === 'tunisia') {
+                flagContainer.textContent = '🇹🇳';
+            } else if (themeName === 'lebanon') {
+                flagContainer.textContent = '🇱🇧';
+            } else {
+                flagContainer.textContent = ''; // Clear icon for default dark/light themes
+            }
+        }
+
+        function changeLanguage(langCode) {
+            document.documentElement.setAttribute('lang', langCode.toLowerCase());
+            document.documentElement.setAttribute('dir', langCode === 'AR' ? 'rtl' : 'ltr');
+            localStorage.setItem('selectedLanguage', langCode);
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (langDictionary[langCode][key]) el.textContent = langDictionary[langCode][key];
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedScreen = sessionStorage.getItem('activeScreen');
+            if (savedScreen && document.getElementById(savedScreen)) switchScreen(savedScreen);
+
+            const initialTheme = localStorage.getItem('selectedTheme') || 'dark';
+            document.getElementById('themeSelect').value = initialTheme;
+            changeTheme(initialTheme);
+
+            const initialLang = localStorage.getItem('selectedLanguage') || 'FR';
+            document.getElementById('langSelect').value = initialLang;
+            changeLanguage(initialLang);
+
+            updateRealTimeData();
+            setInterval(updateRealTimeData, 400);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Control Dashboard</title>
+    <style>
+        /* --- MODERN INDUSTRIAL THEME RESET --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        /* --- GLASSMORPHISM CONTAINERS --- */
+        .panel {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            display: none; /* Controlled by JS */
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #38bdf8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- BUTTON STYLES --- */
+        .btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-menu {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            padding: 18px;
+            text-align: left;
+            font-size: 18px;
+            justify-content: flex-start;
+        }
+        .btn-menu:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-on { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .btn-on:hover { box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4); }
+
+        .btn-off { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); }
+        .btn-off:hover { box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4); }
+
+        .btn-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        .btn-back { background: #334155; font-size: 13px; padding: 8px 16px; }
+
+        /* --- SCREEN 1: WELCOME SCREEN LAYOUT --- */
+        .welcome-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flag-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modern generated Tunisian flag shape */
+        .tunisia-flag {
+            width: 240px;
+            height: 160px;
+            background-color: #e71f28;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(231, 31, 40, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flag-white-circle {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flag-crescent {
+            width: 44px;
+            height: 44px;
+            background-color: #e71f28;
+            border-radius: 50%;
+            position: absolute;
+            left: 18px;
+        }
+        .flag-crescent-cut {
+            width: 36px;
+            height: 36px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            left: 26px;
+        }
+        .flag-star {
+            position: absolute;
+            right: 14px;
+            width: 0; height: 0;
+            border-right: 12px solid transparent;
+            border-bottom: 8px solid #e71f28;
+            border-left: 12px solid transparent;
+            transform: rotate(35deg);
+        }
+        .flag-star:before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -11px;
+            width: 0; height: 0;
+            border-right: 12px solid transparent;
+            border-bottom: 8px solid #e71f28;
+            border-left: 12px solid transparent;
+            transform: rotate(-35deg);
+        }
+        .flag-star:after {
+            content: '';
+            position: absolute;
+            top: -5px; left: -12px;
+            width: 0; height: 0;
+            border-right: 12px solid transparent;
+            border-bottom: 8px solid #e71f28;
+            border-left: 12px solid transparent;
+            transform: rotate(-70deg);
+        }
+
+        /* --- SCREEN 2: CONVEYOR LAYOUT GRID --- */
+        .conveyor-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr 200px;
+            gap: 20px;
+        }
+
+        .card-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Value Inputs/Displays */
+        .io-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .io-field:last-child { margin-bottom: 0; }
+        
+        .io-label { font-size: 14px; color: #cbd5e1; }
+        
+        .io-value {
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: monospace;
+            font-size: 15px;
+            color: #38bdf8;
+            min-width: 90px;
+            text-align: right;
+        }
+
+        input.io-value {
+            color: #f43f5e;
+            outline: none;
+        }
+        input.io-value:focus { border-color: #f43f5e; }
+
+        /* Motor Status Elements */
+        .motor-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #64748b;
+        }
+        .status-dot.active { background: #10b981; box-shadow: 0 0 10px #10b981; }
+
+        /* Modern Conveyor Visualizer */
+        .conveyor-visual {
+            height: 100px;
+            background: #020617;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            overflow: hidden;
+        }
+        .conveyor-belt {
+            position: absolute;
+            left: 25px; right: 25px;
+            height: 8px;
+            background: #475569;
+            border-radius: 4px;
+        }
+        .conveyor-wheel {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: #64748b;
+            border: 4px dashed #1e293b;
+            z-index: 2;
+        }
+        .conveyor-box {
+            position: absolute;
+            left: 45%;
+            top: 25px;
+            width: 30px; height: 30px;
+            background: #38bdf8;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        /* --- SCREEN 3: RFID LAYOUT --- */
+        .rfid-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .rfid-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rfid-indicator {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #334155;
+            color: #94a3b8;
+        }
+        .rfid-indicator.true {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .footer-user {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screen-welcome" class="panel active">
+        <h2>Menu Principal</h2>
+        <div class="welcome-grid">
+            <div class="menu-list">
+                <button class="btn btn-menu" onclick="switchScreen('screen-conveyor')">📂 Convoyer</button>
+                <button class="btn btn-menu" onclick="switchScreen('screen-rfid')">📂 RFID Station</button>
+            </div>
+            <div class="flag-container">
+                <div class="tunisia-flag">
+                    <div class="flag-white-circle">
+                        <div class="flag-crescent"></div>
+                        <div class="flag-crescent-cut"></div>
+                        <div class="flag-star"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-user">👤 Welcome User !!</div>
+    </div>
+
+
+    <div id="screen-conveyor" class="panel">
+        <h2>
+            Gestion Convoyer
+            <button class="btn btn-back" onclick="switchScreen('screen-welcome')">Retour</button>
+        </h2>
+        
+        <div class="conveyor-grid">
+            <div class="card-col">
+                <div class="card">
+                    <div class="card-title">Statut Moteurs</div>
+                    <div class="motor-status">
+                        <div class="status-dot active" id="status-moteur-on"></div>
+                        <span class="io-label">Moteur On</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-moteur-1"></div>
+                        <span class="io-label">Moteur 1</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot active" id="status-moteur-2"></div>
+                        <span class="io-label">Moteur 2</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Mesures</div>
+                    <div class="io-field">
+                        <span class="io-label">Courant:</span>
+                        <span class="io-value" id="val-courant">02.45 A</span>
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label">Tension:</span>
+                        <span class="io-value" id="val-tension">231.2 V</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <div class="card">
+                    <div class="card-title">Production</div>
+                    <div class="io-field">
+                        <span class="io-label">Nombre des Pièces:</span>
+                        <span class="io-value" id="val-nb-pieces">142</span>
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label">Valeur du compteur:</span>
+                        <span class="io-value" id="val-compteur">142</span>
+                    </div>
+                </div>
+
+                <div class="conveyor-visual">
+                    <div class="conveyor-wheel"></div>
+                    <div class="conveyor-belt"></div>
+                    <div class="conveyor-box"></div>
+                    <div class="conveyor-wheel"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Temporisation</div>
+                    <div class="io-field">
+                        <span class="io-label">Fixer Temps:</span>
+                        <input type="number" class="io-value" id="input-fixer-temps" value="5000">
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label">Temps Écoulé:</span>
+                        <span class="io-value" id="val-temps-ecoule">3420 ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <button class="btn btn-on" id="cmd-on">On</button>
+                <button class="btn btn-off" id="cmd-off">Off</button>
+                <button class="btn btn-blue" id="cmd-reset">Reset</button>
+
+                <div class="card" style="margin-top: 10px;">
+                    <div class="card-title">Consignes</div>
+                    <div class="io-field" style="flex-direction: column; align-items: flex-start; gap: 5px;">
+                        <span class="io-label">Position:</span>
+                        <input type="number" class="io-value" style="width: 100%;" id="input-position" value="120">
+                    </div>
+                    <div class="io-field" style="flex-direction: column; align-items: flex-start; gap: 5px; margin-top: 10px;">
+                        <span class="io-label">Vitesse:</span>
+                        <input type="number" class="io-value" style="width: 100%;" id="input-vitesse" value="1500">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="screen-rfid" class="panel">
+        <h2>
+            Station RFID
+            <button class="btn btn-back" onclick="switchScreen('screen-welcome')">Retour</button>
+        </h2>
+
+        <div class="rfid-grid">
+            <div class="card-col">
+                <div class="card-title">Statut Entrées (Inputs)</div>
+                
+                <div class="rfid-status-row">
+                    <span class="io-label">Antenna Status</span>
+                    <span class="rfid-indicator" id="rfid-antenna">Off</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label">Tag Presence</span>
+                    <span class="rfid-indicator true" id="rfid-tag">Present</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label">Command Execution</span>
+                    <span class="rfid-indicator true" id="rfid-cmd-started">Started</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label">Command End Status</span>
+                    <span class="rfid-indicator" id="rfid-cmd-end">Idle</span>
+                </div>
+
+                <div class="card" style="margin-top: 10px;">
+                    <div class="io-field">
+                        <span class="io-label">Data to Read:</span>
+                        <span class="io-value" id="rfid-read-data">A49F3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <div class="card-title">Actions & Sorties (Outputs)</div>
+                
+                <button class="btn btn-blue" id="rfid-btn-read" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">Read Tag</button>
+                <button class="btn btn-blue" id="rfid-btn-write" style="background: linear-gradient(135deg, #0d9488 0%, #115e59 100%);">Write Tag</button>
+
+                <div class="card" style="margin-top: 10px;">
+                    <div class="card-title">Écriture Données</div>
+                    <div class="io-field" style="margin-bottom: 12px;">
+                        <span class="io-label">Target Position:</span>
+                        <input type="number" class="io-value" id="rfid-input-pos" value="85">
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label">String Data:</span>
+                        <input type="text" class="io-value" id="rfid-input-write" value="RUN_62">
+                    </div>
+                </div>
+
+                <button class="btn btn-on" id="rfid-btn-start" style="width: 100%; margin-top: auto;">Execution Start</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Screen Navigation Logic
+        function switchScreen(screenId) {
+            // Hide all panels
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            // Show target panel
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // --- PLACEHOLDERS FOR FUTURE PLC INTEGRATION MAPPING ---
+        // Example: If handling button clicks
+        document.getElementById('cmd-on').addEventListener('click', () => {
+            console.log("Write to PLC: Conveyor ON command activated.");
+        });
+
+        document.getElementById('cmd-off').addEventListener('click', () => {
+            console.log("Write to PLC: Conveyor OFF command activated.");
+        });
+    </script>
+</body>
+</html>

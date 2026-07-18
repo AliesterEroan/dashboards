@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Industrial Dashboard</title>
+    <style>
+        /* ================= THEME DEFINITIONS ================= */
+        :root {
+            --bg-color: #0b0f19;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #111827 0%, #070a13 100%);
+            --bg-grid: rgba(56, 189, 248, 0.03);
+            --panel-bg: rgba(15, 23, 42, 0.65);
+            --panel-border: rgba(56, 189, 248, 0.15);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --input-bg: #020617;
+            --btn-menu-bg: rgba(30, 41, 59, 0.4);
+            --shadow-color: rgba(0, 0, 0, 0.6);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
+            --bg-grid: rgba(15, 23, 42, 0.03);
+            --panel-bg: rgba(255, 255, 255, 0.75);
+            --panel-border: rgba(15, 23, 42, 0.12);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #0284c7;
+            --accent-glow: rgba(2, 132, 199, 0.2);
+            --input-bg: #f8fafc;
+            --btn-menu-bg: rgba(241, 245, 249, 0.9);
+            --shadow-color: rgba(15, 23, 42, 0.08);
+        }
+
+        [data-theme="tunisia"] {
+            --bg-color: #120304;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #1c0507 0%, #090102 100%);
+            --bg-grid: rgba(231, 31, 40, 0.04);
+            --panel-bg: rgba(28, 5, 7, 0.7);
+            --panel-border: rgba(231, 31, 40, 0.3);
+            --text-main: #fff5f5;
+            --text-muted: #fda4af;
+            --accent: #e71f28;
+            --accent-glow: rgba(231, 31, 40, 0.5);
+            --input-bg: #0b0102;
+            --btn-menu-bg: rgba(231, 31, 40, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        [data-theme="lebanon"] {
+            --bg-color: #030f08;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #051e10 0%, #010704 100%);
+            --bg-grid: rgba(16, 185, 129, 0.04);
+            --panel-bg: rgba(5, 30, 16, 0.65);
+            --panel-border: rgba(16, 185, 129, 0.3);
+            --text-main: #f0fdf4;
+            --text-muted: #6ee7b7;
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.5);
+            --input-bg: #010a04;
+            --btn-menu-bg: rgba(16, 185, 129, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* ================= GLOBAL DESIGN ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Orbitron', 'Segoe UI', system-ui, sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { 
+            background: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--text-main); 
+            min-height: 100vh; 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+            background-size: 35px 35px;
+        }
+
+        /* ================= CONTROLS HEADER BAR ================= */
+        .top-nav {
+            width: 100%; max-width: 1200px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; background: var(--panel-bg); padding: 15px 25px;
+            border-radius: 20px; border: 1px solid var(--panel-border);
+            box-shadow: 0 10px 30px var(--shadow-color); backdrop-filter: blur(10px);
+        }
+        .sys-title { font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+        
+        .control-group { display: flex; gap: 15px; align-items: center; }
+        
+        select {
+            background: var(--input-bg); color: var(--text-main); border: 1px solid var(--panel-border);
+            padding: 8px 12px; border-radius: 10px; cursor: pointer; outline: none; font-size: 13px;
+        }
+        select:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+
+        /* ================= GLASS PANELS ================= */
+        .panel { 
+            width: 100%; max-width: 1200px; 
+            background: var(--panel-bg); 
+            border: 1px solid var(--panel-border); 
+            border-radius: 28px; padding: 35px; 
+            box-shadow: 0 25px 55px var(--shadow-color); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: none; 
+        }
+        .panel.active { display: block; animation: activePanel 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes activePanel { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        h2 { font-size: 22px; border-bottom: 2px solid var(--panel-border); padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; font-weight: 500; letter-spacing: 1px;}
+
+        /* ================= NAVIGATION BUTTONS ================= */
+        .welcome-grid { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; max-width: 600px; margin: 40px auto; }
+        
+        .btn { padding: 14px 28px; font-size: 13px; font-weight: 700; border: none; border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 1px; text-transform: uppercase;}
+        .btn:active { transform: scale(0.95); }
+        
+        .btn-menu { background: var(--btn-menu-bg); border: 1px solid var(--panel-border); padding: 30px; font-size: 18px; color: var(--text-main); justify-content: flex-start; border-radius: 20px; box-shadow: 0 8px 20px var(--shadow-color); }
+        .btn-menu:hover { border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-3px); }
+        
+        .btn-on { background: linear-gradient(135deg, #059669 0%, #10b981 100%); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); color: white; width: 100%; }
+        .btn-off { background: linear-gradient(135deg, #be123c 0%, #f43f5e 100%); box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); color: white; width: 100%; }
+        .btn-blue { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); color: white; width: 100%; }
+        .btn-back { background: transparent; border: 1px solid var(--panel-border); color: var(--text-main); padding: 8px 18px; border-radius: 10px; }
+        .btn-back:hover { background: var(--panel-border); }
+        .btn-set { padding: 8px 14px; background: var(--accent); color: #000; font-weight: 700; border-radius: 10px; margin-inline-start: 8px; }
+        .btn-set:hover { box-shadow: 0 0 12px var(--accent-glow); }
+
+        /* ================= GRIDS & INTERIOR CARDS ================= */
+        .conveyor-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 30px; }
+        .card-col { display: flex; flex-direction: column; gap: 20px; }
+        .card { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--panel-border); border-radius: 20px; padding: 22px; box-shadow: inset 0 0 15px rgba(0,0,0,0.2); }
+        [data-theme="light"] .card { background: rgba(255,255,255,0.4); }
+        
+        .card-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px; font-weight: 800; letter-spacing: 1.5px; border-inline-start: 3px solid var(--accent); padding-inline-start: 8px; }
+
+        /* ================= FIELDS & LIVE DATA INDICATORS ================= */
+        .io-field { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .io-label { font-size: 14px; color: var(--text-main); }
+        
+        .io-value { background: var(--input-bg); border: 1px solid var(--panel-border); border-radius: 10px; padding: 8px 14px; font-family: monospace; font-size: 15px; color: var(--accent); min-width: 105px; text-align: end; text-shadow: 0 0 8px var(--accent-glow); }
+        input.io-value { color: #f43f5e; outline: none; width: 120px; text-shadow: none; text-align: center; }
+        input.io-value:focus { border-color: #f43f5e; box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
+
+        .motor-status { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #334155; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        
+        /* Neon animation logic when tags = 1 */
+        .status-dot.val-1, .rfid-indicator.val-1 { 
+            background: #10b981; 
+            box-shadow: 0 0 15px #10b981, 0 0 30px #10b981; 
+            color: #fff; border-color: transparent;
+        }
+
+        /* Animated Dynamic Conveyor Strip Layout */
+        .conveyor-visual { height: 90px; background: var(--input-bg); border-radius: 18px; border: 1px solid var(--panel-border); position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+        .conveyor-belt { position: absolute; left: 40px; right: 40px; height: 6px; background: var(--accent); box-shadow: 0 0 14px var(--accent-glow); opacity: 0.6; }
+        .conveyor-wheel { width: 28px; height: 28px; border-radius: 50%; background: transparent; border: 4px dashed var(--text-muted); animation: spin 3s linear infinite paused; }
+        
+        /* Spin automation wheel asset if operational flag active */
+        body[data-motor-run="true"] .conveyor-wheel { animation-play-state: running; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* ================= RFID MODULES ================= */
+        .rfid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; }
+        .rfid-status-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); border: 1px solid var(--panel-border); padding: 14px 20px; border-radius: 14px; margin-bottom: 12px; }
+        .rfid-indicator { padding: 5px 16px; border-radius: 30px; font-size: 11px; font-weight: 800; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); letter-spacing: 1px; }
+        .setpoint-form { display: flex; width: 100%; align-items: center; }
+
+        /* RTL Specific adjustments for Arabic */
+        html[dir="rtl"] .btn-menu { justify-content: flex-start; }
+        html[dir="rtl"] .card-title { border-inline-start: none; border-inline-end: 3px solid var(--accent); padding-inline-start: 0; padding-inline-end: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="sys-title" data-i18n="nav_title">SYS-CONVEYOR V1.0</div>
+        <div class="control-group">
+            <select id="themeSelect" onchange="changeTheme(this.value)">
+                <option value="dark">🌌 Dark Mode</option>
+                <option value="light">☀️ Light Mode</option>
+                <option value="tunisia">🇹🇳 Theme Tunisie</option>
+                <option value="lebanon">🇱🇧 Theme Liban</option>
+            </select>
+            <select id="langSelect" onchange="changeLanguage(this.value)">
+                <option value="FR">Français</option>
+                <option value="EN">English</option>
+                <option value="AR">العربية</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="screen-welcome" class="panel active">
+        <h2 data-i18n="menu_title">Système de Navigation</h2>
+        <div class="welcome-grid">
+            <button class="btn btn-menu" onclick="switchScreen('screen-conveyor')">
+                <span style="color:var(--accent); margin-inline-end: 20px;">⬢</span> <span data-i18n="menu_conv">Module Convoyeur Principal</span>
+            </button>
+            <button class="btn btn-menu" onclick="switchScreen('screen-rfid')">
+                <span style="color:var(--accent); margin-inline-end: 20px;">⬢</span> <span data-i18n="menu_rfid">Station Traçabilité RFID</span>
+            </button>
+        </div>
+        <div style="margin-top:50px; font-size:11px; color:var(--text-muted); text-align: center; letter-spacing: 2px;" data-i18n="sys_active">
+            HMI SYSTEM ACTIVE // USER AUTHENTICATED
+        </div>
+    </div>
+
+    <div id="screen-conveyor" class="panel">
+        <h2>
+            <span data-i18n="term_conv">Terminal Convoyeur</span>
+            <button class="btn btn-back" onclick="switchScreen('screen-welcome')" data-i18n="btn_back">Retour</button>
+        </h2>
+        
+        <div class="conveyor-grid">
+            <div class="card-col">
+                <div class="card">
+                    <div class="card-title" data-i18n="title_diag">Diagnostics Système</div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-moteur-on"></div>
+                        <span class="io-label" data-i18n="lbl_marche">Moteur On (Marche)</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-moteur-1"></div>
+                        <span class="io-label" data-i18n="lbl_km1">Moteur 1 (KM1)</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-moteur-2"></div>
+                        <span class="io-label" data-i18n="lbl_km2">Moteur 2 (KM2)</span>
+                    </div>
+                    <div class="motor-status" style="margin-top: 25px; border-top: 1px solid var(--panel-border); padding-top: 15px;">
+                        <div class="status-dot" id="status-sensor-b1"></div>
+                        <span class="io-label" data-i18n="lbl_b1">Capteur B1</span>
+                    </div>
+                    <div class="motor-status">
+                        <div class="status-dot" id="status-sensor-b2"></div>
+                        <span class="io-label" data-i18n="lbl_b2">Capteur B2</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" data-i18n="title_energy">Énergie</div>
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="lbl_curr">Courant:</span>
+                        <span class="io-value" id="val-courant">0.00 A</span>
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="lbl_volt">Tension:</span>
+                        <span class="io-value" id="val-tension">0.0 V</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <div class="card">
+                    <div class="card-title" data-i18n="title_prod">Données Production</div>
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="lbl_pieces">Nombre des Pièces:</span>
+                        <span class="io-value" id="val-nbr-pieces" style="color: #10b981; font-weight: bold;">0</span>
+                    </div>
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="lbl_ctrout">Valeur du compteur:</span>
+                        <span class="io-value" id="val-output-compteur">0</span>
+                    </div>
+                </div>
+
+                <div class="conveyor-visual">
+                    <div class="conveyor-wheel"></div>
+                    <div class="conveyor-belt"></div>
+                    <div class="conveyor-wheel"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" data-i18n="title_time">Minuterie Cycle</div>
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="lbl_timeout">Temps Écoulé:</span>
+                        <span class="io-value" id="val-temps-ecoule">0 ms</span>
+                    </div>
+                    <div class="card-title" style="margin-top:20px; border-top: 1px solid var(--panel-border); padding-top: 10px;" data-i18n="lbl_settime">Fixer Temps (ms):</div>
+                    <form method="post" action="" class="setpoint-form">
+                        <input type="number" name='"Temps input"' class="io-value" value="0">
+                        <button type="submit" class="btn btn-set" data-i18n="btn_set">Set</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <form method="post" action=""><input type="hidden" name='"Web_CMD_StartMarche"' value="1"><button type="submit" class="btn btn-on" data-i18n="btn_on">Démarrage (On)</button></form>
+                <form method="post" action=""><input type="hidden" name='"Web_CMD_StopMarche"' value="1"><button type="submit" class="btn btn-off" data-i18n="btn_off">Arrêt (Off)</button></form>
+                <form method="post" action=""><input type="hidden" name='"Web_CMD_Reset"' value="1"><button type="submit" class="btn btn-blue" style="margin-top: 10px;" data-i18n="btn_reset">Reset Compteur</button></form>
+
+                <div class="card" style="margin-top: 15px;">
+                    <div class="card-title" data-i18n="title_motor_param">Paramètres Moteur</div>
+                    
+                    <span class="io-label" style="font-size:12px; color: var(--text-muted);" data-i18n="lbl_pos">Position Cible:</span>
+                    <form method="post" action="" class="setpoint-form" style="margin-bottom:15px; margin-top:5px;">
+                        <input type="number" name='"Pos"' class="io-value" style="width:100%;" value="0">
+                        <button type="submit" class="btn btn-set" data-i18n="btn_set">Set</button>
+                    </form>
+
+                    <span class="io-label" style="font-size:12px; color: var(--text-muted);" data-i18n="lbl_speed">Vitesse:</span>
+                    <form method="post" action="" class="setpoint-form" style="margin-top:5px;">
+                        <input type="number" name='"Vitesse"' class="io-value" style="width:100%;" value="0">
+                        <button type="submit" class="btn btn-set" data-i18n="btn_set">Set</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-rfid" class="panel">
+        <h2>
+            <span data-i18n="term_rfid">Station RFID</span>
+            <button class="btn btn-back" onclick="switchScreen('screen-welcome')" data-i18n="btn_back">Retour</button>
+        </h2>
+
+        <div class="rfid-grid">
+            <div class="card-col">
+                <div class="card-title" data-i18n="title_rfid_in">Statut Capteurs (Inputs)</div>
+                <div class="rfid-status-row">
+                    <span class="io-label" data-i18n="rfid_ant">Antenna Deactivated</span>
+                    <span class="rfid-indicator" id="rfid-antenna">ACTIVE</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label" data-i18n="rfid_tag">Tag Presence</span>
+                    <span class="rfid-indicator" id="rfid-tag">ABSENT</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label" data-i18n="rfid_run">Command Started</span>
+                    <span class="rfid-indicator" id="rfid-cmd-started">IDLE</span>
+                </div>
+                <div class="rfid-status-row">
+                    <span class="io-label" data-i18n="rfid_done">Command End</span>
+                    <span class="rfid-indicator" id="rfid-cmd-end">WAITING</span>
+                </div>
+                <div class="card" style="margin-top: 10px;">
+                    <div class="io-field">
+                        <span class="io-label" data-i18n="rfid_read">Data Read (Hex/Int):</span>
+                        <span class="io-value" style="color:#10b981;" id="val-rfid-read">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-col">
+                <div class="card-title" data-i18n="title_rfid_out">Contrôle Écriture (Outputs)</div>
+                <div class="card">
+                    <div class="card-title" data-i18n="rfid_cmd_byte">Command Byte Out:</div>
+                    <form method="post" action="" class="setpoint-form" style="margin-bottom:25px;">
+                        <input type="number" name='"RFID_commandBteOut"' class="io-value" style="width:100%;" value="0">
+                        <button type="submit" class="btn btn-set" data-i18n="btn_write">Write</button>
+                    </form>
+
+                    <div class="card-title" data-i18n="rfid_write_byte">Data to Write 1:</div>
+                    <form method="post" action="" class="setpoint-form">
+                        <input type="number" name='"RFID_Write_Data 1"' class="io-value" style="width:100%;" value="0">
+                        <button type="submit" class="btn btn-set" data-i18n="btn_write">Write</button>
+                    </form>
+                </div>
+                
+                <form method="post" action="" style="margin-top: auto;">
+                    <input type="hidden" name='"Web_CMD_StartMarche"' value="1">
+                    <button type="submit" class="btn btn-on" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 5px 15px rgba(2, 132, 199, 0.4);" data-i18n="btn_rfid_start">
+                        Execute RFID Start
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dictionary mapping for AR, FR, EN
+        const langDictionary = {
+            FR: {
+                nav_title: "SYS-CONVOYEUR V1.0",
+                menu_title: "Système de Navigation",
+                menu_conv: "Module Convoyeur Principal",
+                menu_rfid: "Station Traçabilité RFID",
+                sys_active: "SYSTÈME HMI ACTIF // UTILISATEUR AUTHENTIFIÉ",
+                term_conv: "Terminal Convoyeur",
+                term_rfid: "Station RFID",
+                btn_back: "Retour",
+                btn_set: "Fixer",
+                btn_on: "Démarrage (On)",
+                btn_off: "Arrêt (Off)",
+                btn_reset: "Reset Compteur",
+                btn_write: "Écrire",
+                btn_rfid_start: "Exécuter Départ RFID",
+                title_diag: "Diagnostics Système",
+                title_energy: "Énergie",
+                title_prod: "Données Production",
+                title_time: "Minuterie Cycle",
+                title_motor_param: "Paramètres Moteur",
+                title_rfid_in: "Statut Capteurs (Inputs)",
+                title_rfid_out: "Contrôle Écriture (Outputs)",
+                lbl_marche: "Moteur On (Marche)",
+                lbl_km1: "Moteur 1 (KM1)",
+                lbl_km2: "Moteur 2 (KM2)",
+                lbl_b1: "Capteur B1",
+                lbl_b2: "Capteur B2",
+                lbl_curr: "Courant:",
+                lbl_volt: "Tension:",
+                lbl_pieces: "Nombre des Pièces:",
+                lbl_ctrout: "Valeur du compteur:",
+                lbl_timeout: "Temps Écoulé:",
+                lbl_settime: "Fixer Temps (ms):",
+                lbl_pos: "Position Cible:",
+                lbl_speed: "Vitesse:",
+                rfid_ant: "Antenne Désactivée",
+                rfid_tag: "Présence Tag",
+                rfid_run: "Commande Lancée",
+                rfid_done: "Commande Terminée",
+                rfid_read: "Donnée lue (Hex/Int):",
+                rfid_cmd_byte: "Octet Commande Out:",
+                rfid_write_byte: "Donnée à Écrire 1:"
+            },
+            EN: {
+                nav_title: "SYS-CONVEYOR V1.0",
+                menu_title: "Navigation System",
+                menu_conv: "Main Conveyor Module",
+                menu_rfid: "RFID Traceability Station",
+                sys_active: "HMI SYSTEM ACTIVE // USER AUTHENTICATED",
+                term_conv: "Conveyor Terminal",
+                term_rfid: "RFID Station",
+                btn_back: "Back",
+                btn_set: "Set",
+                btn_on: "Start (On)",
+                btn_off: "Stop (Off)",
+                btn_reset: "Reset Counter",
+                btn_write: "Write",
+                btn_rfid_start: "Execute RFID Start",
+                title_diag: "System Diagnostics",
+                title_energy: "Energy Metrics",
+                title_prod: "Production Data",
+                title_time: "Cycle Timer",
+                title_motor_param: "Motor Parameters",
+                title_rfid_in: "Sensor Status (Inputs)",
+                title_rfid_out: "Write Control (Outputs)",
+                lbl_marche: "Motor On (Marche)",
+                lbl_km1: "Motor 1 (KM1)",
+                lbl_km2: "Motor 2 (KM2)",
+                lbl_b1: "Sensor B1",
+                lbl_b2: "Sensor B2",
+                lbl_curr: "Current:",
+                lbl_volt: "Voltage:",
+                lbl_pieces: "Total Pieces:",
+                lbl_ctrout: "Counter Value:",
+                lbl_timeout: "Elapsed Time:",
+                lbl_settime: "Set Target Time (ms):",
+                lbl_pos: "Target Position:",
+                lbl_speed: "Speed Setpoint:",
+                rfid_ant: "Antenna Status",
+                rfid_tag: "Tag Presence",
+                rfid_run: "Command Running",
+                rfid_done: "Command Done",
+                rfid_read: "Data Read (Hex/Int):",
+                rfid_cmd_byte: "Command Byte Out:",
+                rfid_write_byte: "Data to Write 1:"
+            },
+            AR: {
+                nav_title: "نظام الحزام الناقل V1.0",
+                menu_title: "نظام التحكم والملاحة",
+                menu_conv: "وحدة الحزام الناقل الرئيسي",
+                menu_rfid: "محطة تتبع وتحديد الهوية RFID",
+                sys_active: "نظام HMI نشط // تم التحقق من هوية المستخدم",
+                term_conv: "لوحة تحكم الحزام الناقل",
+                term_rfid: "محطة RFID",
+                btn_back: "رجوع",
+                btn_set: "تعديل",
+                btn_on: "تشغيل (On)",
+                btn_off: "إيقاف (Off)",
+                btn_reset: "إعادة تعيين العداد",
+                btn_write: "كتابة",
+                btn_rfid_start: "تنفيذ تشغيل RFID",
+                title_diag: "تشخيص النظام الحالي",
+                title_energy: "قياسات الطاقة الكهربائية",
+                title_prod: "بيانات الإنتاج الإجمالية",
+                title_time: "مؤقت الدورة الحالية",
+                title_motor_param: "إعدادات المحرك الحركية",
+                title_rfid_in: "حالة المستشعرات (Inputs)",
+                title_rfid_out: "التحكم في الكتابة (Outputs)",
+                lbl_marche: "المحرك قيد التشغيل (Marche)",
+                lbl_km1: "المحرك الأول (KM1)",
+                lbl_km2: "المحرك الثاني (KM2)",
+                lbl_b1: "المستشعر البصري B1",
+                lbl_b2: "المستشعر البصري B2",
+                lbl_curr: "شدة التيار:",
+                lbl_volt: "الجهد الكهربائي:",
+                lbl_pieces: "إجمالي عدد القطع:",
+                lbl_ctrout: "قيمة العداد الحالي:",
+                lbl_timeout: "الوقت المنقضي:",
+                lbl_settime: "ضبط الوقت المستهدف (ms):",
+                lbl_pos: "الموقع المستهدف:",
+                lbl_speed: "السرعة المحددة:",
+                rfid_ant: "حالة الهوائي الهيكلي",
+                rfid_tag: "وجود بطاقة التتبع",
+                rfid_run: "الأمر قيد التنفيذ الآن",
+                rfid_done: "تم إنهاء الأمر بنجاح",
+                rfid_read: "البيانات المقروءة (Hex/Int):",
+                rfid_cmd_byte: "بايت التحكم الصادر:",
+                rfid_write_byte: "البيانات المراد كتابتها 1:"
+            }
+        };
+
+        // Screen Routing Manager
+        function switchScreen(screenId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            sessionStorage.setItem('activeScreen', screenId);
+        }
+
+        // Real-Time Cyclic Background AJAX Engine
+        function updateRealTimeData() {
+            const cacheBuster = "?t=" + new Date().getTime();
+            
+            fetch('data.html' + cacheBuster)
+                .then(response => {
+                    if (!response.ok) throw new Error("PLC Unreachable");
+                    return response.text();
+                })
+                .then(text => {
+                    const data = JSON.parse(text);
+                    const currentLang = document.getElementById('langSelect').value;
+
+                    // Compute dynamic spinning status based on Marche bit string state
+                    const isRunning = (data.Marche == "1" || data.Marche == "true");
+                    document.body.setAttribute('data-motor-run', isRunning ? "true" : "false");
+
+                    // Update Boolean Status Indicators
+                    updateStatusDot('status-moteur-on', isRunning);
+                    updateStatusDot('status-moteur-1', data.km1 == "1" || data.km1 == "true");
+                    updateStatusDot('status-moteur-2', data.km2 == "1" || data.km2 == "true");
+                    updateStatusDot('status-sensor-b1', data.b1 == "1" || data.b1 == "true");
+                    updateStatusDot('status-sensor-b2', data.b2 == "1" || data.b2 == "true");
+
+                    // Update Process Values
+                    document.getElementById('val-courant').textContent = parseFloat(data.Courant_ScaleX || 0).toFixed(2) + " A";
+                    document.getElementById('val-tension').textContent = parseFloat(data.Tension_ScaleX || 0).toFixed(1) + " V";
+                    document.getElementById('val-nbr-pieces').textContent = data.input_compteur || "0";
+                    document.getElementById('val-output-compteur').textContent = data.input_compteur || "0";
+                    document.getElementById('val-temps-ecoule').textContent = (data.temps_output || "0") + " ms";
+
+                    // Update Dynamic Multilingual RFID Badges
+                    const txtAnt = data.RFID_Antenna_Deactivated == "1" ? langDictionary[currentLang].rfid_ant : (currentLang == "AR" ? "نشط" : "ACTIVE");
+                    const txtTag = data.RFID_Tag_Present == "1" ? langDictionary[currentLang].btn_on.split(' ')[0] : langDictionary[currentLang].btn_off.split(' ')[0];
+                    const txtRun = data.RFID_CmdStart == "1" ? (currentLang == "AR" ? "يعمل" : "RUNNING") : (currentLang == "AR" ? "خامل" : "IDLE");
+                    const txtEnd = data.RFID_CmdEnd == "1" ? langDictionary[currentLang].rfid_done.split(' ')[1] : (currentLang == "AR" ? "انتظار" : "WAITING");
+
+                    updateRFIDIndicator('rfid-antenna', data.RFID_Antenna_Deactivated == "1", txtAnt, txtAnt);
+                    updateRFIDIndicator('rfid-tag', data.RFID_Tag_Present == "1", txtTag, txtTag);
+                    updateRFIDIndicator('rfid-cmd-started', data.RFID_CmdStart == "1", txtRun, txtRun);
+                    updateRFIDIndicator('rfid-cmd-end', data.RFID_CmdEnd == "1", txtEnd, txtEnd);
+                    
+                    document.getElementById('val-rfid-read').textContent = data.RFID_Read_Data_1 || "0";
+                })
+                .catch(err => console.warn('Sync hold...', err));
+        }
+
+        function updateStatusDot(elementId, isActive) {
+            const el = document.getElementById(elementId);
+            if (el) isActive ? el.classList.add('val-1') : el.classList.remove('val-1');
+        }
+
+        function updateRFIDIndicator(elementId, isActive, textTrue, textFalse) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = isActive ? textTrue : textFalse;
+            isActive ? el.classList.add('val-1') : el.classList.remove('val-1');
+        }
+
+        // Silent Background POST Processing
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch(window.location.href, { method: 'POST', body: formData })
+                .then(() => setTimeout(updateRealTimeData, 100));
+            });
+        });
+
+        // Theme Switcher Logic Engine
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('selectedTheme', themeName);
+        }
+
+        // Language Layout Switcher Engine
+        function changeLanguage(langCode) {
+            document.documentElement.setAttribute('lang', langCode.toLowerCase());
+            document.documentElement.setAttribute('dir', langCode === 'AR' ? 'rtl' : 'ltr');
+            localStorage.setItem('selectedLanguage', langCode);
+
+            // Redraw every dynamic text string mapped via data-i18n tags
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (langDictionary[langCode][key]) {
+                    el.textContent = langDictionary[langCode][key];
+                }
+            });
+        }
+
+        // Boot Management Lifecycle Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedScreen = sessionStorage.getItem('activeScreen');
+            if (savedScreen && document.getElementById(savedScreen)) switchScreen(savedScreen);
+
+            const initialTheme = localStorage.getItem('selectedTheme') || 'dark';
+            document.getElementById('themeSelect').value = initialTheme;
+            changeTheme(initialTheme);
+
+            const initialLang = localStorage.getItem('selectedLanguage') || 'FR';
+            document.getElementById('langSelect').value = initialLang;
+            changeLanguage(initialLang);
+
+            updateRealTimeData();
+            setInterval(updateRealTimeData, 400);
+        });
+    </script>
+</body>
+</html>
